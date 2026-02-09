@@ -192,12 +192,38 @@ if uploaded_file is not None:
         # Check 4
         # --------------------------------------------------
         h2("4️⃣ Dieren met twee geslachten")
-        st.markdown("Dieren die zowel als vader en als moeder voorkomen.")
-
-        if st.button("Zoek dubbele rollen"):
-            both = (set(df[sire_col]) & set(df[dam_col])) - {"0", "", "nan", "None"}
-            st.metric("Aantal dieren", len(both))
-
+        st.markdown("Zoek dieren die als vader en als moeder in de stamboom staan.")
+        
+        if st.button("Zoek dieren die zowel vader en moeder zijn", key="check4"):
+            # Get animals that appear as both sire and dam
+            sires = set(df[sire_col].unique()) - {'0', '', 'nan', 'None'}
+            dams = set(df[dam_col].unique()) - {'0', '', 'nan', 'None'}
+            both_roles = sires & dams
+            
+            st.metric("Aantal dieren die vader en moeder zijn.", len(both_roles))
+            
+            if len(both_roles) > 0:
+                # Create Excel file with sheets per ID
+                output = io.BytesIO()
+                with pd.ExcelWriter(output, engine='openpyxl') as writer:
+                    for animal_id in sorted(both_roles):
+                        # Get records where this animal is sire or dam
+                        records = df[(df[sire_col] == animal_id) | (df[dam_col] == animal_id)]
+                        # Limit sheet name to 31 characters (Excel limitation)
+                        sheet_name = str(animal_id)[:31]
+                        records.to_excel(writer, sheet_name=sheet_name, index=False)
+                
+                output.seek(0)
+                
+                st.success(f"Excel bestand aangemaakt met {len(both_roles)} tabbladen")
+                st.download_button(
+                    label="Download Excel Bestand",
+                    data=output,
+                    file_name="dubbele_rol_dieren.xlsx",
+                    mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    key="download4"
+                )
+        
         st.divider()
 
         # --------------------------------------------------
