@@ -230,34 +230,207 @@ if uploaded_file is not None:
         # Check 5
         # --------------------------------------------------
         h2("5️⃣ Geboortedatum inconsistenties")
-
-        if st.button("Voer geboortedatum controle uit"):
-            lookup = dict(zip(df[id_col], df[dob_col]))
-            issues = []
-
-            for _, r in df.iterrows():
-                if pd.notna(r[dob_col]):
-                    for role, col in [("Vader", sire_col), ("Moeder", dam_col)]:
-                        parent = r[col]
-                        if parent in lookup and pd.notna(lookup[parent]):
-                            if r[dob_col] <= lookup[parent]:
-                                issues.append(r)
-
-            issues_df = pd.DataFrame(issues)
-            st.metric("Aantal inconsistenties", len(issues_df))
-            if not issues_df.empty:
-                st.dataframe(issues_df, use_container_width=True)
-
+        st.markdown("Zoek dieren die geboren zijn voor hun ouders. Let wel: vaak zijn dit dieren waarvan de geboortedatum eigenlijk onbekend was, en die bijv. op 1-1-1900 zijn gezet. Let op dat deze niet worden meegnoemen in het berekenen van het generatieinterval. Voor andere inconsitenties, kan het zijn dat de afstamming niet klopt, of dat de geboortedatum van de nakomeling of het ouderdier niet klopt.")
+        
+        if st.button("Voer geboortedatum controle uit", key="check5"):
+            # Create a date lookup
+            date_lookup = dict(zip(df[id_col], df[dob_col]))
+            
+            inconsistency_data = []
+            
+            for idx, row in df.iterrows():
+                animal_id = row[id_col]
+                animal_dob = row[dob_col]
+                sire_id = row[sire_col]
+                dam_id = row[dam_col]
+                
+                if pd.notna(animal_dob):
+                    problems = []
+                    sire_dob = None
+                    dam_dob = None
+                    
+                    # Check sire
+                    if sire_id in date_lookup and sire_id not in ['0', '', 'nan']:
+                        sire_dob = date_lookup[sire_id]
+                        if pd.notna(sire_dob) and animal_dob <= sire_dob:
+                            problems.append('vader')
+                    
+                    # Check dam
+                    if dam_id in date_lookup and dam_id not in ['0', '', 'nan']:
+                        dam_dob = date_lookup[dam_id]
+                        if pd.notna(dam_dob) and animal_dob <= dam_dob:
+                            problems.append('moeder')
+                    
+                    if problems:
+                        inconsistency_data.append({
+                            'Dier_ID': animal_id,
+                            'Geboortedatum_Dier': animal_dob,
+                            'Vader_ID': sire_id if sire_id not in ['0', '', 'nan'] else '',
+                            'Geboortedatum_Vader': sire_dob if pd.notna(sire_dob) else '',
+                            'Moeder_ID': dam_id if dam_id not in ['0', '', 'nan'] else '',
+                            'Geboortedatum_Moeder': dam_dob if pd.notna(dam_dob) else '',
+                            'Probleem_bij': ', '.join(problems)
+                        })
+            
+            st.metric("Aantal datum inconsistenties", len(inconsistency_data))
+            
+            if len(inconsistency_data) > 0:
+                inconsistent_df = pd.DataFrame(inconsistency_data)
+                st.dataframe(inconsistent_df, hide_index=True, use_container_width=True)
+                
+                csv = inconsistent_df.to_csv(index=False)
+                st.download_button(
+                    label="Download inconsistente records",
+                    data=csv,
+                    file_name="geboortedatum_inconsistenties.csv",
+                    mime="text/csv",
+                    key="download5"
+                )
+        
         st.divider()
 
         # --------------------------------------------------
         # Check 6
         # --------------------------------------------------
         h2("6️⃣ Kringverwijzingen")
-        st.markdown("Detecteer kringverwijzingen in de stamboomstructuur.")
-
-        if st.button("Zoek kringverwijzingen"):
-            st.success("Geen kringverwijzingen gevonden! ✅")
+        st.markdown("Zoek dieren die geboren zijn voor hun ouders. Let wel: vaak zijn dit dieren waarvan de geboortedatum eigenlijk onbekend was, en die bijv. op 1-1-1900 zijn gezet. Let op dat deze niet worden meegnoemen in het berekenen van het generatieinterval. Voor andere inconsitenties, kan het zijn dat de afstamming niet klopt, of dat de geboortedatum van de nakomeling of het ouderdier niet klopt.")
+        
+        if st.button("Voer geboortedatum controle uit", key="check5"):
+            # Create a date lookup
+            date_lookup = dict(zip(df[id_col], df[dob_col]))
+            
+            inconsistency_data = []
+            
+            for idx, row in df.iterrows():
+                animal_id = row[id_col]
+                animal_dob = row[dob_col]
+                sire_id = row[sire_col]
+                dam_id = row[dam_col]
+                
+                if pd.notna(animal_dob):
+                    problems = []
+                    sire_dob = None
+                    dam_dob = None
+                    
+                    # Check sire
+                    if sire_id in date_lookup and sire_id not in ['0', '', 'nan']:
+                        sire_dob = date_lookup[sire_id]
+                        if pd.notna(sire_dob) and animal_dob <= sire_dob:
+                            problems.append('vader')
+                    
+                    # Check dam
+                    if dam_id in date_lookup and dam_id not in ['0', '', 'nan']:
+                        dam_dob = date_lookup[dam_id]
+                        if pd.notna(dam_dob) and animal_dob <= dam_dob:
+                            problems.append('moeder')
+                    
+                    if problems:
+                        inconsistency_data.append({
+                            'Dier_ID': animal_id,
+                            'Geboortedatum_Dier': animal_dob,
+                            'Vader_ID': sire_id if sire_id not in ['0', '', 'nan'] else '',
+                            'Geboortedatum_Vader': sire_dob if pd.notna(sire_dob) else '',
+                            'Moeder_ID': dam_id if dam_id not in ['0', '', 'nan'] else '',
+                            'Geboortedatum_Moeder': dam_dob if pd.notna(dam_dob) else '',
+                            'Probleem_bij': ', '.join(problems)
+                        })
+            
+            st.metric("Aantal datum inconsistenties", len(inconsistency_data))
+            
+            if len(inconsistency_data) > 0:
+                inconsistent_df = pd.DataFrame(inconsistency_data)
+                st.dataframe(inconsistent_df, hide_index=True, use_container_width=True)
+                
+                csv = inconsistent_df.to_csv(index=False)
+                st.download_button(
+                    label="Download inconsistente records",
+                    data=csv,
+                    file_name="geboortedatum_inconsistenties.csv",
+                    mime="text/csv",
+                    key="download5"
+                )
+        
+        st.divider()
+        
+        # Check 6: Circular References (Kringverwijzingen)
+        st.markdown("Detecteer kringverwijzingen in de stamboom.")
+        
+        if st.button("Zoek kringverwijzingen", key="check6"):
+            def find_circular_references(df, id_col, sire_col, dam_col):
+                """Find circular references in pedigree"""
+                # Build parent dictionary
+                parents = {}
+                for _, row in df.iterrows():
+                    animal_id = str(row[id_col])
+                    sire = str(row[sire_col])
+                    dam = str(row[dam_col])
+                    
+                    parent_list = []
+                    if sire not in ['0', '', 'nan', 'None']:
+                        parent_list.append(sire)
+                    if dam not in ['0', '', 'nan', 'None']:
+                        parent_list.append(dam)
+                    
+                    if parent_list:
+                        parents[animal_id] = parent_list
+                
+                # Find circular references using DFS
+                circular_refs = []
+                
+                def has_cycle(node, visited, rec_stack, path):
+                    visited.add(node)
+                    rec_stack.add(node)
+                    path.append(node)
+                    
+                    if node in parents:
+                        for parent in parents[node]:
+                            if parent not in visited:
+                                if has_cycle(parent, visited, rec_stack, path):
+                                    return True
+                            elif parent in rec_stack:
+                                # Found a cycle
+                                cycle_start = path.index(parent)
+                                cycle = path[cycle_start:] + [parent]
+                                circular_refs.append(cycle)
+                                return True
+                    
+                    path.pop()
+                    rec_stack.remove(node)
+                    return False
+                
+                visited = set()
+                for node in parents.keys():
+                    if node not in visited:
+                        has_cycle(node, visited, set(), [])
+                
+                return circular_refs
+            
+            circular_refs = find_circular_references(df, id_col, sire_col, dam_col)
+            
+            if len(circular_refs) > 0:
+                st.error(f"⚠️ {len(circular_refs)} kringverwijzing(en) gevonden!")
+                st.markdown("---")
+                
+                for i, cycle in enumerate(circular_refs, 1):
+                    st.markdown(f"### Kringverwijzing {i}")
+                    st.markdown(f"**Pad:** `{' → '.join(cycle)}`")
+                    st.markdown("---")
+                
+                # Create downloadable report
+                report_lines = []
+                for i, cycle in enumerate(circular_refs, 1):
+                    report_lines.append(f"Kringverwijzing {i}: {' → '.join(cycle)}")
+                
+                report_text = '\n'.join(report_lines)
+                st.download_button(
+                    label="Download kringverwijzingen rapport",
+                    data=report_text,
+                    file_name="kringverwijzingen.txt",
+                    mime="text/plain",
+                    key="download6"
+                )
+            else:
+                st.success("Geen kringverwijzingen gevonden! ✅")
 
     except Exception as e:
         st.error(f"Fout bij het lezen van bestand: {e}")
