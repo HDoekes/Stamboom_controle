@@ -169,23 +169,65 @@ if uploaded_file is not None:
         h2("3️⃣ Verdacht aantal nakomelingen")
         st.markdown("Top 20 vaders en moeders met de meeste nakomelingen.")
 
-        if st.button("Tel nakomelingen"):
+        if st.button("Tel nakomelingen", key="check3"):
+            # Count offspring for sires
+            sire_counts = df[df[sire_col].isin(set(df[sire_col]) - {'0', '', 'nan'})].groupby(sire_col).size()
+            sire_counts = sire_counts.sort_values(ascending=False).head(20)
+            
+            # Count offspring for dams
+            dam_counts = df[df[dam_col].isin(set(df[dam_col]) - {'0', '', 'nan'})].groupby(dam_col).size()
+            dam_counts = dam_counts.sort_values(ascending=False).head(20)
+            
             col1, col2 = st.columns(2)
-
+            
             with col1:
-                h3("Top 20 Vaders")
-                sire_counts = df[df[sire_col].isin(df[sire_col])].groupby(sire_col).size().sort_values(ascending=False).head(20)
-                sire_df = sire_counts.reset_index(name="Aantal Nakomelingen")
-                st.dataframe(sire_df, use_container_width=True)
-                st.download_button("Download top vaders", sire_df.to_csv(index=False), "top_vaders.csv")
-
+                st.subheader("Top 20 Vaders")
+                # Create dataframe with offspring count and full records
+                sire_ids = sire_counts.index.tolist()
+                sire_records = df[df[id_col].isin(sire_ids)].copy()
+                
+                # Add offspring count column
+                sire_records['Aantal_Nakomelingen'] = sire_records[id_col].map(sire_counts)
+                
+                # Reorder columns: Aantal_Nakomelingen first, then all original columns
+                cols = ['Aantal_Nakomelingen'] + [col for col in sire_records.columns if col != 'Aantal_Nakomelingen']
+                sire_df = sire_records[cols].sort_values('Aantal_Nakomelingen', ascending=False).reset_index(drop=True)
+                
+                st.dataframe(sire_df, use_container_width=True, hide_index=True)
+                
+                csv_sires = sire_df.to_csv(index=False)
+                st.download_button(
+                    label="Download top vaders",
+                    data=csv_sires,
+                    file_name="top_vaders.csv",
+                    mime="text/csv",
+                    key="download3a"
+                )
+            
             with col2:
-                h3("Top 20 Moeders")
-                dam_counts = df[df[dam_col].isin(df[dam_col])].groupby(dam_col).size().sort_values(ascending=False).head(20)
-                dam_df = dam_counts.reset_index(name="Aantal Nakomelingen")
-                st.dataframe(dam_df, use_container_width=True)
-                st.download_button("Download top moeders", dam_df.to_csv(index=False), "top_moeders.csv")
-
+                st.subheader("Top 20 Moeders")
+                # Create dataframe with offspring count and full records
+                dam_ids = dam_counts.index.tolist()
+                dam_records = df[df[id_col].isin(dam_ids)].copy()
+                
+                # Add offspring count column
+                dam_records['Aantal_Nakomelingen'] = dam_records[id_col].map(dam_counts)
+                
+                # Reorder columns: Aantal_Nakomelingen first, then all original columns
+                cols = ['Aantal_Nakomelingen'] + [col for col in dam_records.columns if col != 'Aantal_Nakomelingen']
+                dam_df = dam_records[cols].sort_values('Aantal_Nakomelingen', ascending=False).reset_index(drop=True)
+                
+                st.dataframe(dam_df, use_container_width=True, hide_index=True)
+                
+                csv_dams = dam_df.to_csv(index=False)
+                st.download_button(
+                    label="Download top moeders",
+                    data=csv_dams,
+                    file_name="top_moeders.csv",
+                    mime="text/csv",
+                    key="download3b"
+                )
+        
         st.divider()
 
         # --------------------------------------------------
