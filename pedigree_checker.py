@@ -230,7 +230,7 @@ if uploaded_file is not None:
         # Check 5
         # --------------------------------------------------
         h2("5️⃣ Geboortedatum inconsistenties")
-        st.markdown("Zoek dieren die geboren zijn voor hun ouders. Let wel: vaak zijn dit dieren waarvan de geboortedatum eigenlijk onbekend was, en die bijv. op 1-1-1900 zijn gezet. Let op dat deze niet worden meegenomen in het berekenen van het generatieinterval. Voor andere inconsitenties, kan het zijn dat de afstamming niet klopt, of dat de geboortedatum van de nakomeling of het ouderdier niet klopt.")
+        st.markdown("Zoek dieren die geboren zijn voor hun ouders. Let wel: vaak zijn dit dieren (nakomelingen en/of ouders) waarvan de geboortedatum eigenlijk onbekend was, en die bijv. op 1-1-1900 zijn gezet. Let op dat deze niet worden meegenomen in het berekenen van het generatieinterval. Voor andere inconsitenties, kan het zijn dat de afstamming niet klopt, of dat de geboortedatum van de nakomeling of het ouderdier niet klopt.")
         
         if st.button("Controleer geboortedata", key="check5"):
             # Create a date lookup
