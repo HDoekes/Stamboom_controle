@@ -16,7 +16,7 @@ def h1(text):
     st.markdown(
         f"""
         <h1 style="
-            font-size:48px;
+            font-size:40px;
             font-weight:700;
             margin-bottom:1.5rem;
             color:#262730;
@@ -31,7 +31,7 @@ def h2(text):
     st.markdown(
         f"""
         <h2 style="
-            font-size:32px;
+            font-size:28px;
             font-weight:600;
             margin-top:2.5rem;
             margin-bottom:1rem;
