@@ -123,7 +123,7 @@ if uploaded_file is not None:
         # Check 1
         # --------------------------------------------------
         h2("1️⃣ Ontbrekende dieren")
-        st.markdown("Zoek dieren die als ouder voorkomen maar niet zelf geregistreerd staan.")
+        st.markdown("Zoek dieren die als ouder voorkomen maar niet zelf geregistreerd staan. Voeg deze dieren toe aan de stamboom (met onbekende ouders, onbekende geboortedatum, etc.)")
 
         if st.button("Zoek ontbrekende dieren"):
             all_ids = set(df[id_col])
@@ -147,7 +147,7 @@ if uploaded_file is not None:
         # Check 2
         # --------------------------------------------------
         h2("2️⃣ Duplicaten")
-        st.markdown("Zoek dieren die meerdere keren in het bestand staan.")
+        st.markdown("Zoek dieren die meerdere keren in het bestand staan. Check handmatig en verwijderen duplicaten zodat er maar 1 per dier overblijft.")
 
         if st.button("Zoek duplicaten"):
             dupes = df[df.duplicated(id_col, keep=False)]
@@ -167,7 +167,7 @@ if uploaded_file is not None:
         # Check 3
         # --------------------------------------------------
         h2("3️⃣ Verdacht aantal nakomelingen")
-        st.markdown("Top 20 vaders en moeders met de meeste nakomelingen.")
+        st.markdown("Top 20 vaders en moeders met de meeste nakomelingen. Dieren met onwaarschijnlijk veel nakomelingen (bijv vrouwelijke dieren met meer dan 30 nakomelingen) zijn 'verdacht'. In een dergelijk geval kunnen de nakomelingen beter een onbekende ouder krijgen (ofwel als een leeg veld of als een '0')")
 
         if st.button("Tel nakomelingen", key="check3"):
             # Count offspring for sires
@@ -234,7 +234,7 @@ if uploaded_file is not None:
         # Check 4
         # --------------------------------------------------
         h2("4️⃣ Dieren met twee geslachten")
-        st.markdown("Zoek dieren die als vader en als moeder in de stamboom staan.")
+        st.markdown("Zoek dieren die als vader en als moeder in de stamboom staan. Check deze dieren handmatig en pas aan waar nodig (bijv. als een hengst een keer als moeder staat, verwijder dan zijn ID uit de moederkolom)")
         
         if st.button("Zoek dieren die zowel vader en moeder zijn", key="check4"):
             # Get animals that appear as both sire and dam
@@ -272,7 +272,7 @@ if uploaded_file is not None:
         # Check 5
         # --------------------------------------------------
         h2("5️⃣ Geboortedatum inconsistenties")
-        st.markdown("Zoek dieren die geboren zijn voor hun ouders. Let wel: vaak zijn dit dieren (nakomelingen en/of ouders) waarvan de geboortedatum eigenlijk onbekend was, en die bijv. op 1-1-1900 zijn gezet. Let op dat deze niet worden meegenomen in het berekenen van het generatieinterval. Voor andere inconsitenties, kan het zijn dat de afstamming niet klopt, of dat de geboortedatum van de nakomeling of het ouderdier niet klopt.")
+        st.markdown("Zoek dieren die geboren zijn voor hun ouders. Let wel: vaak zijn dit dieren (nakomelingen en/of ouders) waarvan de geboortedatum eigenlijk onbekend was, en die bijv. op 1-1-1900 zijn gezet. Voor andere inconsitenties, kan het zijn dat de afstamming niet klopt, of dat de geboortedatum van de nakomeling of het ouderdier niet klopt. Verwijder in al deze gevallen de geboortedata van de berekening van het generatieinterval.")
         
         if st.button("Controleer geboortedata", key="check5"):
             # Create a date lookup
@@ -335,7 +335,7 @@ if uploaded_file is not None:
         # Check 6
         # --------------------------------------------------
         h2("6️⃣ Kringverwijzingen")
-        st.markdown("Detecteer kringverwijzingen in de stamboomstructuur")
+        st.markdown("Detecteer kringverwijzingen in de stamboomstructuur. Bij kringverwijzingen is een dier een voorouder van zichzelf (bijv. de ouder van zichzelf). Check deze kringverwijzingen handmatig en pas aan in de afstamming.")
         
         if st.button("Zoek kringverwijzingen", key="check6"):
             def find_circular_references(df, id_col, sire_col, dam_col):
