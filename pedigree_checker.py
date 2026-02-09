@@ -264,11 +264,11 @@ if uploaded_file is not None:
                     if problems:
                         inconsistency_data.append({
                             'Dier_ID': animal_id,
-                            'Geboortedatum_Dier': animal_dob,
+                            'Geboortedatum_Dier': animal_dob.strftime('%d-%m-%Y') if pd.notna(animal_dob) else '',
                             'Vader_ID': sire_id if sire_id not in ['0', '', 'nan'] else '',
-                            'Geboortedatum_Vader': sire_dob if pd.notna(sire_dob) else '',
+                            'Geboortedatum_Vader': sire_dob.strftime('%d-%m-%Y') if pd.notna(sire_dob) else '',
                             'Moeder_ID': dam_id if dam_id not in ['0', '', 'nan'] else '',
-                            'Geboortedatum_Moeder': dam_dob if pd.notna(dam_dob) else '',
+                            'Geboortedatum_Moeder': dam_dob.strftime('%d-%m-%Y') if pd.notna(dam_dob) else '',
                             'Probleem_bij': ', '.join(problems)
                         })
             
