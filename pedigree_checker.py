@@ -243,6 +243,7 @@ else:
     st.info("👆 Upload een stamboom CSV-bestand om te starten")
 
     h2("📄 Verwacht Bestandsformaat")
+    st.markdown("Uw bestand moet er ongeveer zo uitzien (mag meer kolommen bevatten, en andere kolomnamen hebben):")
     st.code(
         """ID,Vader,Moeder,Geboortedatum
 141209548,0,0,1-1-1970
