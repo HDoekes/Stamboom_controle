@@ -134,7 +134,7 @@ if uploaded_file is not None:
 
             if missing:
                 missing_df = pd.DataFrame({id_col: sorted(missing)})
-                st.dataframe(missing_df, use_container_width=True)
+                st.dataframe(missing_df, hide_index=True, use_container_width=True)
                 st.download_button(
                     "Download ontbrekende dieren",
                     missing_df.to_csv(index=False),
