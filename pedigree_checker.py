@@ -154,7 +154,7 @@ if uploaded_file is not None:
             st.metric("Aantal duplicaten", dupes[id_col].nunique())
 
             if not dupes.empty:
-                st.dataframe(dupes.sort_values(id_col), use_container_width=True)
+                st.dataframe(dupes.sort_values(id_col), hide_index=True, use_container_width=True)
                 st.download_button(
                     "Download duplicaten",
                     dupes.to_csv(index=False),
