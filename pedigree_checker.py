@@ -62,8 +62,8 @@ def h3(text):
 # --------------------------------------------------
 # Title
 # --------------------------------------------------
-h1("🐴 Stamboom voorbereiding – controleer op veelvoorkomende fouten")
-st.markdown("Upload uw stamboombestand en voer verschillende kwaliteitscontroles uit.")
+h1("🐴 Stamboom check op veelvoorkomende fouten")
+st.markdown("Upload uw stamboombestand en voer verschillende controles uit.")
 
 # --------------------------------------------------
 # Upload + separator
