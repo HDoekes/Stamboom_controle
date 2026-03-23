@@ -48,6 +48,10 @@ TRANSLATIONS = {
         "check1_btn": "Zoek ontbrekende dieren",
         "check1_metric": "Aantal ontbrekende dieren",
         "check1_download": "Download ontbrekende dieren",
+        "check1_role_col": "Rol",
+        "check1_role_sire": "Vader",
+        "check1_role_dam": "Moeder",
+        "check1_role_both": "Vader en Moeder",
         
         "check2_title": "2️⃣ Duplicaten",
         "check2_desc": "Zoek dieren die meerdere keren in het bestand staan. Check handmatig en verwijderen duplicaten zodat er maar 1 per dier overblijft.",
@@ -119,6 +123,10 @@ TRANSLATIONS = {
         "check1_btn": "Find Missing Animals",
         "check1_metric": "Number of Missing Animals",
         "check1_download": "Download Missing Animals",
+        "check1_role_col": "Role",
+        "check1_role_sire": "Sire",
+        "check1_role_dam": "Dam",
+        "check1_role_both": "Sire and Dam",
         
         "check2_title": "2️⃣ Duplicates",
         "check2_desc": "Find animals that appear multiple times in the file. Check manually and remove duplicates so only 1 remains per animal.",
@@ -279,13 +287,32 @@ if uploaded_file is not None:
 
         if st.button(t["check1_btn"]):
             all_ids = set(df[id_col])
-            parents = (set(df[sire_col]) | set(df[dam_col])) - {"0", "", "nan", "None"}
-            missing = parents - all_ids
+            unknown_vals = {"0", "", "nan", "None"}
+
+            sires_set = set(df[sire_col]) - unknown_vals
+            dams_set = set(df[dam_col]) - unknown_vals
+
+            missing_sires = sires_set - all_ids
+            missing_dams = dams_set - all_ids
+            missing = missing_sires | missing_dams
 
             st.metric(t["check1_metric"], len(missing))
 
             if missing:
-                missing_df = pd.DataFrame({id_col: sorted(missing)})
+                def get_role(animal_id):
+                    is_sire = animal_id in missing_sires
+                    is_dam = animal_id in missing_dams
+                    if is_sire and is_dam:
+                        return t["check1_role_both"]
+                    elif is_sire:
+                        return t["check1_role_sire"]
+                    else:
+                        return t["check1_role_dam"]
+
+                missing_df = pd.DataFrame({
+                    id_col: sorted(missing),
+                    t["check1_role_col"]: [get_role(aid) for aid in sorted(missing)]
+                })
                 st.dataframe(missing_df, hide_index=True, use_container_width=True)
                 st.download_button(
                     t["check1_download"],
