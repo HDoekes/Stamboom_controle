@@ -246,10 +246,10 @@ if uploaded_file is not None:
     try:
         # Try reading with UTF-8 encoding first, fallback to latin1
         try:
-            df = pd.read_csv(uploaded_file, sep=separator, encoding='utf-8')
+            df = pd.read_csv(uploaded_file, sep=separator, encoding='utf-8', dtype=str)
         except UnicodeDecodeError:
-            uploaded_file.seek(0)  # Reset file pointer
-            df = pd.read_csv(uploaded_file, sep=separator, encoding='latin1')
+            uploaded_file.seek(0)
+            df = pd.read_csv(uploaded_file, sep=separator, encoding='latin1', dtype=str)
         
         st.success(t["success"].format(count=len(df)))
 
