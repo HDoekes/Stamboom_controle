@@ -272,10 +272,18 @@ if uploaded_file is not None:
         with c4:
             dob_col = st.selectbox(t["dob_col"], df.columns, index=min(3, len(df.columns)-1))
 
-        df[id_col] = df[id_col].astype(str)
-        df[sire_col] = df[sire_col].astype(str)
-        df[dam_col] = df[dam_col].astype(str)
-        df[dob_col] = pd.to_datetime(df[dob_col], errors="coerce")
+        # NOTE: read_csv(dtype=str) still leaves truly-empty cells as an
+        # actual float NaN (not the text "nan"). .astype(str) alone does
+        # NOT convert those NaNs to strings, so a mix of str + float NaN
+        # can end up in these columns and later break sorting/comparisons
+        # with "'<' not supported between instances of 'str' and 'float'".
+        # fillna("0") first so every missing parent/id becomes the string
+        # "0", which the rest of the app already treats as "unknown".
+        df[id_col] = df[id_col].fillna("0").astype(str).str.strip()
+        df[sire_col] = df[sire_col].fillna("0").astype(str).str.strip()
+        df[dam_col] = df[dam_col].fillna("0").astype(str).str.strip()
+        # dayfirst=True because dates like "08-05-1985" are DD-MM-YYYY
+        df[dob_col] = pd.to_datetime(df[dob_col], errors="coerce", dayfirst=True)
 
         st.divider()
 
